@@ -31,7 +31,7 @@
       	</li>
       
 		<li class="nav-item">
-	     	<a class="nav-link collapsed" href="javaScript:void(0)">
+	     	<a class="nav-link collapsed" href="${pageContext.request.contextPath }/admin/book?action=allBooks">
 	     		<i class="bi bi-book"></i>
 	     		<span>Book List</span>
 	     	</a>

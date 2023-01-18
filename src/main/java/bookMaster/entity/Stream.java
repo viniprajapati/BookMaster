@@ -23,6 +23,9 @@ public class Stream {
 	
 	@Column(name = "created_at")
 	Date createdAt;
+	
+	@Column(name = "deleted_at")
+	Date deletedAt;
 
 	public Stream() {
 		
@@ -60,9 +63,12 @@ public class Stream {
 		this.createdAt = createdAt;
 	}
 
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
 
-	
+	public void setDeletedAt(Date deletedAt) {
+		this.deletedAt = deletedAt;
+	}
 
-	
-	
 }

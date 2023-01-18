@@ -8,7 +8,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import bookMaster.admin.model.admin_m;
+import bookMaster.admin.model.admin_stream_m;
 import bookMaster.entity.Admin;
+import bookMaster.entity.Stream;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ public class admin_librarian extends HttpServlet {
 			response.sendRedirect(encode+"/admin/login");
 		}else {
 			String action = request.getParameter("action");
+			String encode = response.encodeURL(request.getContextPath());
 			switch (action) {
 			case "list":
 				listLibrarian(request, response);
@@ -41,9 +44,7 @@ public class admin_librarian extends HttpServlet {
 				break;
 			case "deleteLibrarian":
 				deleteLibrarian(request, response);
-				break;
-			case "statusLibrarian":
-				statusLibrarianForm(request, response);
+				response.sendRedirect(encode+"/admin/librarian?action=list");
 				break;
 			default:
 				listLibrarian(request, response);
@@ -51,7 +52,6 @@ public class admin_librarian extends HttpServlet {
 			}
 		}
 	}
-	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
@@ -139,13 +139,10 @@ public class admin_librarian extends HttpServlet {
 	}
 	
 	private void deleteLibrarian(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
 		
-	}
-	
-	private void statusLibrarianForm(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
+		int lib_id = Integer.parseInt(request.getParameter("admin_id"));
+		new admin_m().deleteLibrarian(lib_id);
+		return;
 	}
 
 }

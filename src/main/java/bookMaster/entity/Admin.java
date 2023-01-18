@@ -30,6 +30,9 @@ public class Admin {
 	@Column(name = "created_at")
 	private Date createdAt;
 	
+	@Column(name = "deleted_at")
+	private Date deletedAt;
+	
 	public Admin() {
 		
 	}
@@ -104,7 +107,15 @@ public class Admin {
 		this.createdAt = created_at;
 	}
 
-//	@Override
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(Date deletedAt) {
+		this.deletedAt = deletedAt;
+	}
+
+	//	@Override
 	public String toString() {
 		return "Admin [adminId=" + adminId + ", userName=" + userName + ", password=" + password + ", role=" + role
 				+ ", status=" + status + ", createdAt=" + createdAt + "]";

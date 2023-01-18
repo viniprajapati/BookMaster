@@ -10,7 +10,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "users")
 public class Users {
-
 	@Id
 	@Column(name = "user_id")
 	int userId;
@@ -38,6 +37,9 @@ public class Users {
 	
 	@Column(name = "created_at")
 	Date createdAt;
+	
+	@Column(name = "deleted_at")
+	Date deletedAt;
 	
 	public Users() {
 		super();
@@ -113,6 +115,14 @@ public class Users {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public Date getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(Date deletedAt) {
+		this.deletedAt = deletedAt;
 	}
 	
 	

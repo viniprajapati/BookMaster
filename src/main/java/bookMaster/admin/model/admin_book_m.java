@@ -6,31 +6,51 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import bookMaster.entity.Users;
+import bookMaster.entity.Books;
 import bookMaster.hibernate.utility.HibernateUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 
-public class admin_user_m {
+public class admin_book_m {
 
-	public List<Users> listUser(DataSource dataSource) {
-		
-		List<Users> listUsers = new ArrayList<>();
+	public List<Books> listAllBooks() {
+
+		List<Books> bookList = new ArrayList<>();
 		Session session = null;
 		Transaction transaction = null;
 		
 		try {
 			session = HibernateUtil.getSession();
 			transaction = session.beginTransaction();
-			listUsers = session.createQuery("From Users where deleted_at is null").list();
+			
+			bookList = session.createQuery("From Books where deleted_at is null").list();
+			transaction.commit();
+		} catch (HibernateException e) {
+			System.out.println("Hibenate exception "+e);
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return bookList;
+	}
 
+	public Books getBookById(int bookId) {
+		
+		Books book = null;
+		Session session = null;
+		Transaction transaction = null;
+		
+		try {
+			
+			session = HibernateUtil.getSession();
+			transaction = session.beginTransaction();
+			
+			book = (Books) session.createQuery("From Books where book_id = "+bookId+" and deleted_at is null").uniqueResult();
 			transaction.commit();
 		} catch (HibernateException e) {
 			System.out.println("Hibernate exception "+e);
@@ -39,10 +59,10 @@ public class admin_user_m {
 			session.close();
 		}
 		
-		return listUsers;
+		return book;
 	}
-
-	public void addUser(Users user, DataSource dataSource) {
+	
+	public void addBook(Books book) {
 		
 		Session session = null;
 		Transaction transaction = null;
@@ -51,19 +71,20 @@ public class admin_user_m {
 			session = HibernateUtil.getSession();
 			transaction = session.beginTransaction();
 			
-			session.save(user);
+			session.save(book);
 			transaction.commit();
 		} catch (HibernateException e) {
 			System.out.println("Hibernate exception "+e);
 			e.printStackTrace();
 		}finally {
+			session.clear();
 			session.close();
 		}
+		
 	}
 
-	public Users getUserById(int userId) {
+	public void updateBook(HttpServletRequest request) throws IOException, ServletException {
 		
-		Users user = null;
 		Session session = null;
 		Transaction transaction = null;
 		
@@ -71,63 +92,40 @@ public class admin_user_m {
 			
 			session = HibernateUtil.getSession();
 			transaction = session.beginTransaction();
+			String bookImgPath = "G:\\JAVA\\upload_img\\book_img";
+			int bookId = Integer.parseInt(request.getParameter("book_id"));
 			
-			user = (Users) session.createQuery("From Users where user_id = "+userId+" and deleted_at is null").uniqueResult();
-			transaction.commit();
-		} catch (HibernateException e) {
-			System.out.println("Hibernate exception "+e);
-			e.printStackTrace();
-		}finally {
-			session.close();
-		}
-		
-		return user;
-	}
-
-	public void updateUser(HttpServletRequest request) throws IOException, ServletException {
-		
-		Session session = null;
-		Transaction transaction = null;
-		
-		try {
-			session = HibernateUtil.getSession();
-			transaction = session.beginTransaction();
-			String userImgPath = "G:\\JAVA\\upload_img\\user_profile_img";
-			int userId = Integer.parseInt(request.getParameter("userId"));
-			
-			Users user = session.get(Users.class, userId);
-			File uploadDir = new File(userImgPath);
+			Books book = session.get(Books.class, bookId);
+			File uploadDir = new File(bookImgPath);
 			
 			if(!uploadDir.exists()) uploadDir.mkdir();
 			
-			Part file = request.getPart("profile_img");
+			Part file = request.getPart("book_img");
 			String fileName = file.getSubmittedFileName();
-			System.out.println("filename "+fileName.isEmpty());
 			if(!fileName.isEmpty()) {
-				System.out.println("in if");
-				file.write(userImgPath+ File.separator+ fileName);
-				user.setProfilePhoto(fileName);
-			}else {
-				System.out.println("in else");
+				file.write(bookImgPath + File.separator + fileName);
+				book.setBookPhoto(fileName);
 			}
 			
-			user.setUserName(request.getParameter("userName"));
-			user.setEmail(request.getParameter("email"));
-			user.setPassword(request.getParameter("password"));
-			user.setStatus(Integer.parseInt(request.getParameter("status")));
-			user.setStreamId(Integer.parseInt(request.getParameter("streamId")));
+			book.setBookName(request.getParameter("name"));
+			book.setAuthor(request.getParameter("author"));
+			book.setPublisher(request.getParameter("publisher"));
+			book.setStreamId(Integer.parseInt(request.getParameter("stream_id")));
+			book.setTotalBook(Integer.parseInt(request.getParameter("total_book")));
+			book.setLeftBook((Integer.parseInt(request.getParameter("total_book")) - book.getIssuedBook()));
+			book.setStatus(Integer.parseInt(request.getParameter("status")));
 			
 			transaction.commit();
+			
 		} catch (HibernateException e) {
 			System.out.println("Hibernate exception "+e);
 			e.printStackTrace();
 		}finally {
 			session.close();
 		}
-		
 	}
-
-	public void deleteUser(int userId) {
+	
+	public void deleteBook(int bookId) {
 		
 		Session session = null;
 		Transaction transaction = null;
@@ -137,15 +135,15 @@ public class admin_user_m {
 			session = HibernateUtil.getSession();
 			transaction = session.beginTransaction();
 			
-			Users user = session.get(Users.class, userId);
-			user.setDeletedAt(new Date());
+			Books book = session.get(Books.class, bookId);
+			book.setDeletedAt(new Date());
 			
 			transaction.commit();
 			
 		} catch (HibernateException e) {
 			System.out.println("Hibernate exception "+e);
 			e.printStackTrace();
-		}finally {
+		} finally {
 			session.close();
 		}
 	}

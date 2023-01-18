@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import bookMaster.entity.Admin;
+import bookMaster.entity.Stream;
 import bookMaster.hibernate.utility.HibernateUtil;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -77,10 +78,6 @@ public class admin_m {
 			session = HibernateUtil.getSession();
 			transaction = session.beginTransaction();
 			
-//			Query query = session.createSQLQuery("Update Admin set userName = :userName, status = :status, role = :role "+"where admin_id = :adminId");
-//			session.update(admin);
-//			int result = query.executeUpdate();
-			
 			int lib_id = Integer.parseInt(request.getParameter("admin_id"));
 			Admin lib = session.get(Admin.class, lib_id);
 			lib.setUserName(request.getParameter("userName"));
@@ -90,6 +87,27 @@ public class admin_m {
 			transaction.commit();
 		} catch (HibernateException e) {
 			System.out.println("Hibernate exception "+e);
+			e.printStackTrace();
+		}finally {
+			session.close();
+		}
+	}
+
+	public void deleteLibrarian(int lib_id) {
+		
+		Session session = null;
+		Transaction transaction = null;
+		
+		try {
+			session = HibernateUtil.getSession();
+			transaction = session.beginTransaction();
+			
+			Admin admin = session.get(Admin.class, lib_id);
+			admin.setDeletedAt(new Date());
+			
+			transaction.commit();
+		} catch (HibernateException e) {
+			System.out.println("Hibernate exceptio jhn "+e);
 			e.printStackTrace();
 		}finally {
 			session.close();

@@ -20,12 +20,23 @@ public class admin_home extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		String encode = response.encodeURL(request.getContextPath());
 		if(request.getSession().getAttribute("username") == null) {
-			String encode = response.encodeURL(request.getContextPath());
 			response.sendRedirect(encode+"/admin/login");
 		}else {
-			request.setAttribute("title","Dashboard");
-			request.getRequestDispatcher("index.jsp").forward(request, response);
+			
+			String action = request.getParameter("action");
+			switch (action) {
+			case "logout":
+				request.getSession().invalidate();
+				response.sendRedirect(encode+"/admin/login");
+				break;
+
+			default:				
+				request.setAttribute("title","Dashboard");
+				request.getRequestDispatcher("index.jsp").forward(request, response);
+				break;
+			}
 		}
 
 	}

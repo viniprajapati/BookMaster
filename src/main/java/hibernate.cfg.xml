@@ -13,5 +13,6 @@
   <mapping class="bookMaster.entity.Admin"/>
   <mapping class="bookMaster.entity.Users"/>
   <mapping class="bookMaster.entity.Stream"/>
+  <mapping class="bookMaster.entity.Books"/>
  </session-factory>
 </hibernate-configuration>

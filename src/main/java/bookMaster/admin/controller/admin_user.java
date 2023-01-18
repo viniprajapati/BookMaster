@@ -4,16 +4,13 @@ import jakarta.servlet.http.HttpServlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 import javax.sql.DataSource;
-
-import org.apache.commons.io.FilenameUtils;
-
+import bookMaster.admin.model.admin_stream_m;
 import bookMaster.admin.model.admin_user_m;
+import bookMaster.entity.Stream;
 import bookMaster.entity.Users;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -53,9 +50,8 @@ public class admin_user extends HttpServlet {
 				break;
 			case "deleteUser":
 				deleteUser(request, response);
-				break;
-			case "statusUser":
-				statusUserForm(request, response);
+				String encode = response.encodeURL(request.getContextPath());
+				response.sendRedirect(encode+"/admin/user?action=list");
 				break;
 			default:
 				listUser(request, response);
@@ -101,6 +97,11 @@ public class admin_user extends HttpServlet {
 	
 	private void addUserListing(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		List<Stream> streamList = new ArrayList<>();
+		streamList = new admin_stream_m().listOfStream();
+		request.setAttribute("streams", streamList);
+		System.out.println(streamList);
+
 		request.setAttribute("title", "Add User");
 		request.getRequestDispatcher("users_add.jsp").forward(request, response);
 		
@@ -115,37 +116,50 @@ public class admin_user extends HttpServlet {
 		
 		Part file = request.getPart("profile_img");
 		String fileName = file.getSubmittedFileName();
-		if(fileName != null || fileName != "") {
+		if(fileName.isEmpty()) {
 			file.write(userImgPath+ File.separator+ fileName);
 			user.setProfilePhoto(fileName);
 		}
 		user.setUserName(request.getParameter("userName"));
 		user.setEmail(request.getParameter("email"));
+		user.setPassword(request.getParameter("password"));
+		user.setStatus(Integer.parseInt(request.getParameter("status")));
+		user.setStreamId(Integer.parseInt(request.getParameter("streamId")));
+		user.setCreatedAt(new Date());
 		
+		new admin_user_m().addUser(user, dataSource);
 		return;
 	}
 	
 	private void updateUserListing(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		int userId = Integer.parseInt(request.getParameter("userId"));
+		int userId = Integer.parseInt(request.getParameter("user_id"));
+		Users user = new Users();
+		user = new admin_user_m().getUserById(userId);
+		
+		List<Stream> streamList = new ArrayList<>();
+		streamList = new admin_stream_m().listOfStream();
 		
 		request.setAttribute("title", "Update User");
+		request.setAttribute("userData", user);
+		request.setAttribute("streams", streamList);
+		System.out.println(streamList);
 		request.getRequestDispatcher("users_edit.jsp").forward(request, response);
 		
 	}
 
-	private void updateUserForm(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
+	private void updateUserForm(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
-	}
-	
-	private void statusUserForm(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
+		new admin_user_m().updateUser(request);
+		return;
 	}
 
 	private void deleteUser(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
+		
+		int userId  = Integer.parseInt(request.getParameter("user_id"));
+		new admin_user_m().deleteUser(userId);
+		
+		return;
 		
 	}
 

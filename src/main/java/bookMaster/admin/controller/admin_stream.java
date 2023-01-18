@@ -45,6 +45,7 @@ public class admin_stream extends HttpServlet {
 			response.sendRedirect(encode+"/admin/login");
 		}else {
 			String action = request.getParameter("action");
+			String encode = response.encodeURL(request.getContextPath());
 			switch (action) {
 			case "list":
 				listAllStream(request, response);
@@ -52,15 +53,17 @@ public class admin_stream extends HttpServlet {
 			case "updateStream":
 				updateStream(request, response);
 				break;
+			case "deleteStream":
+				deleteStream(request, response);
+				response.sendRedirect(encode+"/admin/stream?action=list");
+				break;
 			default:
+				listAllStream(request, response);
 				break;
 			}
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if(request.getSession().getAttribute("username") == null) {
@@ -75,10 +78,6 @@ public class admin_stream extends HttpServlet {
 			
 			case "updateStreamForm":
 				updateStreamForm(request, response);
-				break;
-				
-			case "deleteStream":
-				deleteStream(request, response);
 				break;
 				
 			default:
@@ -103,11 +102,13 @@ public class admin_stream extends HttpServlet {
 		stream.setName(request.getParameter("streamName"));
 		stream.setStatus(Integer.parseInt(request.getParameter("status")));
 		new admin_stream_m().addStream(stream, dataSource);
-		String greet ="true";
 		
-		response.setContentType("text/plain");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(greet);
+		JSONObject json = new JSONObject();
+		json.append("status", "true");
+		
+		response.setContentType("application/json;charset=utf-8");
+
+		response.getWriter().print(json);
 	}
 
 	private void updateStream(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -131,13 +132,22 @@ public class admin_stream extends HttpServlet {
 	}
 	
 	private void updateStreamForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		
+		new admin_stream_m().updateStream(request, dataSource);
+		response.setContentType("application/json;charset=utf-8");
+		
+		JSONObject json = new JSONObject();
+		
+		json.append("status","true");
+		response.getWriter().print(json);
 	}
 
 	private void deleteStream(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		
+		int streamId = Integer.parseInt(request.getParameter("stream_id"));
+		int res = new admin_stream_m().deleteStream(streamId);
+		
+		return;
 	}
 
 }

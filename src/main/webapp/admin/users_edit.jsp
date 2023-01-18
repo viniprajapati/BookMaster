@@ -28,15 +28,16 @@
 						<h5 class="card-title">General Form Elements</h5>
 
 						<!-- General Form Elements -->
-						<form class="row g-3" action="${pageContext.request.contextPath }/admin/user?action=addUserForm" method="post" enctype="multipart/form-data">
-
+						<form class="row g-3" action="${pageContext.request.contextPath }/admin/user?action=updateUserForm" method="post" enctype="multipart/form-data">
+							
+							<input type="hidden" name="userId" value="${userData.userId }">
 							<div class="col-md-6">
 								<label for="validationCustom01" class="form-label">Username</label>
-							 	<input type="text" name="userName" value="" class="form-control" id="validationCustom01">
+							 	<input type="text" name="userName" value="${userData.userName }" class="form-control" id="validationCustom01">
 							</div>
 							<div class="col-md-6">
 								<label for="validationCustom02" class="form-label">Email</label>
-							 	<input type="text" name="email" value="" class="form-control" id="validationCustom02">
+							 	<input type="text" name="email" value="${userData.email }" class="form-control" id="validationCustom02">
 							</div>
 							<div class="col-md-6">
 			                  	<label for="validationCustom03" class="col-sm-2 col-form-label">File Upload</label>
@@ -46,22 +47,22 @@
 			                </div>
 							<div class="col-md-6">
 								<label for="validationCustom04" class="form-label">Password</label>
-								<input type="password" name="password" value="" class="form-control" id="validationCustom04">
+								<input type="password" name="password" value="${userData.password }" class="form-control" id="validationCustom04">
 							</div>
 							<div class="col-md-6">
 								<label for="validationCustom05" class="form-label">Stream</label>
 								<select name="streamId" class="form-select" id="validationCustom05">
 									<option disabled selected>Choose..</option>
 									<c:forEach items="${streams }" var="stream">
-										<option value="${stream.streamId }">${stream.name }</option>
+										<option value="${stream.streamId }" <c:if test="${stream.streamId eq userData.streamId }">selected</c:if> >${stream.name }</option>
 									</c:forEach>
 								</select>
 							</div>
 							<div class="col-md-6">
 								<label for="validationCustom06" class="form-label">Status</label>
 								<select name="status" class="form-select" id="validationCustom06">
-									<option selected value="1">Active</option>
-									<option value="0">In-Active</option>
+									<option value="1" <c:if test="${userData.status eq 0}">selected</c:if>>Active</option>
+									<option value="0" <c:if test="${userData.status eq 0}">selected</c:if>>In-Active</option>
 								</select>
 							</div>
 							<div class="text-center">
